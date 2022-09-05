@@ -1,0 +1,39 @@
+Enter Chat and press enter
+<div><input id=input placeholder="message" /></div>
+
+Chat Output
+<div id=box></div>
+
+<script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+<script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.28.2.min.js"></script>
+<script> (function() {
+        var username = prompt("Enter a username", "Anonymous");
+        var pubnub = new PubNub({
+            publishKey: 'demo',
+            subscribeKey: 'demo'
+        });
+        function $(id) {
+            return document.getElementById(id);
+        }
+        var box = $('box'),
+            input = $('input'),
+            channel = 'general';
+        pubnub.addListener({
+            message: function(obj) {
+                box.innerHTML = (username + ': ' + obj.message).replace(/[<>]/g, '') + '<br>' + box.innerHTML
+            }
+        });
+        pubnub.subscribe({
+            channels: [channel]
+        });
+        input.addEventListener('keyup', function(e) {
+            if ((e.keyCode || e.charCode) === 13) {
+                pubnub.publish({
+                    channel: channel,
+                    message: input.value,
+                    x: (input.value = '')
+                });
+            }
+        });
+    })();
+</script>
